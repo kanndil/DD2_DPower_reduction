@@ -1,0 +1,11 @@
+
+
+
+
+##this code is taken from ()
+## some snnipets of the code were used 
+## thus we are refrencing their github repo for integrity
+
+https://github.com/marwanH1998/AutomaticClockGatingDD2/blob/master/main.py
+
+

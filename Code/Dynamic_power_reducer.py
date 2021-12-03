@@ -5,9 +5,8 @@ from pyverilog.ast_code_generator.codegen import ASTCodeGenerator
 
 
 
-
-
-rtl = "test2.gl.v"
+######################################################
+rtl = "/Users/youssef/Downloads/test1(1).v"
 ast,_ = parse([rtl])
 # get the root node of the tree (Description)
 desc = ast.description
@@ -18,53 +17,27 @@ definition = desc.definitions[0]
 # print the cell ports and their corresponding arguments
 
 newrtl= []
-inputlist = []
-outputlist= [] 
-clkgateArgs = [
- vast.PortArg("GCLK", vast.Identifier("__clockgate_output_gclk_")),
- vast.PortArg("GATE", vast.Identifier("EN")),
- vast.PortArg("CLK", vast.Identifier("CLK"))
-]
+################################################
+new_clk = vast.Wire('new_clk')
+new_enable= vast.Reg('new_enable')
+newrtl.append(new_clk)
 
-clkgate_cell = vast.Instance(
- "sky130_fd_sc_hd__dlclkp",
- "__clockgate_cell__",
- tuple(clkgateArgs),
- tuple()
-)
-clockgate_output_gclk = vast.Wire('__clockgate_output_gclk_')
+newrtl.append(new_enable)
+
+####################################################
 
 
-k=0
-insertedbefore=0;
-newrtl.append(clockgate_output_gclk)
+
+
 for itemDeclaration in definition.items:
     item_type = type(itemDeclaration).__name__
-    if item_type == "InstanceList":
-        instance = itemDeclaration.instances[0]
-        if(instance.module == "sky130_fd_sc_hd__mux2_1"):
-            print(instance.module)
-            if insertedbefore ==0:
-                newrtl.append(vast.InstanceList("sky130_fd_sc_hd__dlclkp", tuple(), tuple([clkgate_cell])))
-                insertedbefore=1
-            for hook in instance.portlist:
-                if hook.portname == "A1": #input
-                    inputlist.append(hook.argname)
-                if hook.portname == "A0": #output
-                    outputlist.append(hook.argname)
-            continue
-       # print("cell-name: ", instance.module, "instance-name: ", instance.name)
-        for hook in instance.portlist:
-            if hook.portname == "CLK":
-                print("change to clk input which is __clockgate_output_gclk_",hook.argname)
-                hook.argname=vast.Identifier('__clockgate_output_gclk_')
-            if hook.portname == "D":
-                    hook.argname=inputlist[k]
-            if hook.portname == "Q":
-                    hook.argname=outputlist[k]
-        k = k + 1
-       # print("portname: ", hook.portname, "argname: ", hook.portname)
-    newrtl.append(itemDeclaration)
+    if item_type == "Always":
+        print('x')
+
+
+    else:
+
+        newrtl.append(itemDeclaration)
 
 
 definition.items = tuple(newrtl)
