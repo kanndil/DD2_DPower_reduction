@@ -3,10 +3,8 @@ from pyverilog.vparser.parser import parse
 from pyverilog.ast_code_generator.codegen import ASTCodeGenerator
 
 
-
-
 ######################################################
-rtl = "/Users/youssef/Downloads/test1(1).v"
+rtl = "Code/test1(1).v"
 ast,_ = parse([rtl])
 # get the root node of the tree (Description)
 desc = ast.description
@@ -32,6 +30,7 @@ newrtl.append(new_enable)
 for itemDeclaration in definition.items:
     item_type = type(itemDeclaration).__name__
     if item_type == "Always":
+        
         print('x')
 
 
