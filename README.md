@@ -5,5 +5,9 @@ A utility to reduce the dynamic power consumption by performing automatic clock 
     - Adham Meligy
 
 
+# references
+    -https://github.com/marwanH1998/AutomaticClockGatingDD2/blob/master/main.py
+    
+
 
     
