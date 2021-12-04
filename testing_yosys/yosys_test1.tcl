@@ -1,7 +1,7 @@
 yosys -import
 
 #read design
-read_verilog test1.v
+read_verilog testUpdated.v
 
 #generic synthesis
 synth -top test1
