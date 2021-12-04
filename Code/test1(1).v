@@ -1,5 +1,12 @@
-module test1(input [3:0] x, y, input s, input clk, output [3:0] r);
-	reg [3:0] r;
-	always @(posedge clk)
-		if(s) r <= x + y;
+module test1
+(
+  input x,
+  input s,
+  input clk,
+  output reg r
+);
+  always @(posedge clk)
+  if(s) r <= x ;
+
+
 endmodule
