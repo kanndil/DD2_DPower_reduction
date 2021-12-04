@@ -5,7 +5,8 @@ module test1
   input clk,
   output reg r
 );
-  always @(posedge clk) r <= x ;
+  always @(posedge clk)
+  if(s) r <= x ;
 
 
 endmodule
