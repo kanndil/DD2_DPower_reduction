@@ -40,7 +40,7 @@ for itemDeclaration in definition.items:
                     if(instance_two.module == "sky130_fd_sc_hd__a21oi_1"):
                         A1_input=None
                         A2_input=None
-                        for hook in instance.portlist:
+                        for hook in instance_two.portlist:
                             if hook.portname == "A1":
                                 A1_input=hook
                             if hook.portname == "A2":
@@ -50,9 +50,10 @@ for itemDeclaration in definition.items:
 
                                     # do connect inputs of this aoi to ICG  and append the ICG 
                                     # because thois is the matching hook
-                                    
+                                    GCLK=vast.PortArg("GCLK", vast.Identifier("_clockgate_output_gclk"))
+
                                     clkgateArgs = [ # add counter to the identifier string to identify different clk gate outputs
-                                    vast.PortArg("GCLK", vast.Identifier("_clockgate_output_gclk")),
+                                    GCLK,
                                     vast.PortArg("GATE",A1_input.argname ),
                                     vast.PortArg("CLK", vast.Identifier("CLK")) # match names later##########
                                     ]
@@ -63,9 +64,47 @@ for itemDeclaration in definition.items:
                                     tuple(clkgateArgs),
                                     tuple()
                                     )
+                                    #do not forget wire
                                     clockgate_output_gclk = vast.Wire('_clockgate_output_gclk') # match names
-                                    newrtl.append(vast.InstanceList("sky130_fd_sc_hd__dlclkp", tuple(), tuple([clkgate_cell])))
+                                    ICG=vast.InstanceList("sky130_fd_sc_hd__dlclkp", tuple(), tuple([clkgate_cell]))
+                                    newrtl.append(ICG)
                                     #ICG created
+
+
+                                    #create the connection between iCG and dff and append dff 
+                                    # _clockgate_output_gclk -->> clk dff
+                                    #  (~A2) inversion of sum --> d dff
+
+                                    # creating inverter
+                                    #sky130_fd_sc_hd__inv_1
+                                    inv_out= vast.PortArg("A", vast.Identifier("_inv_Gclk"))
+                                    invArgs = [ # add counter to the identifier string to identify different clk gate outputs
+                                    inv_out,
+                                    vast.PortArg("Y",A2_input.argname )
+                                    ]
+
+                                    inv_cell = vast.Instance(
+                                    "sky130_fd_sc_hd__inv_1",
+                                    "_inv_Gclk",
+                                    tuple(invArgs),
+                                    tuple()
+                                    )
+                                    
+                                    # inverter needs completion
+
+                                    #dff
+                                    dff= itemDeclaration
+                                    instance_dff = dff.instances[0]
+                                    for port in instance_dff.portlist:
+                                        if port.portname == "CLK": #CLK
+                                            port.argname= GCLK.argname
+                                        if port.portname == "D": #output
+                                            D_input.argname= A2_input.argname
+                                    newrtl.append(dff)
+
+
+
+
                                     
 
 
