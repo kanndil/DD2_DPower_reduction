@@ -6,7 +6,7 @@ from pyverilog.ast_code_generator.codegen import ASTCodeGenerator
 
 
 ######################################################
-rtl = "test1(1).v"
+rtl = "test2.v"
 ast,_ = parse([rtl])
 # get the root node of the tree (Description)
 desc = ast.description
@@ -32,9 +32,7 @@ for itemDeclaration in definition.items:
     item_type = type(itemDeclaration).__name__
     if item_type == "Always":
         for port in port_list:
-
-
-                if(str(port.first.name) == str(itemDeclaration.statement.cond)):
+                if(str(port.first.name) == str(itemDeclaration.statement.statements[0].statement.cond)):
                     print("in")
                     #designing latch statement
                     
@@ -78,6 +76,6 @@ for itemDeclaration in definition.items:
 definition.items = tuple(newrtl)
 codegen = ASTCodeGenerator()
 rslt = codegen.visit(ast)
-f = open("testUpdated.v", "w+")
+f = open("test_2_Updated.v", "w+")
 f.write(rslt)
 f.close()
