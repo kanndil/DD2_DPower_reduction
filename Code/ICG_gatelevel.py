@@ -67,8 +67,12 @@ for itemDeclaration in definition.items:
                                     tuple()
                                     )
                                     #do not forget wire
+<<<<<<< HEAD
                                     clockgate_output_gclk = vast.Wire('_clockgate_output_gclk') # match names\
                                     newrtl.append(clockgate_output_gclk)
+=======
+                                    clockgate_output_gclk = vast.Wire('_clockgate_output_gclk') # match names
+>>>>>>> 75db610358a2134f7dfc134e475ac22dcb2bbe93
                                     ICG=vast.InstanceList("sky130_fd_sc_hd__dlclkp", tuple(), tuple([clkgate_cell]))
                                     newrtl.append(ICG)
                                     #ICG created
@@ -80,6 +84,7 @@ for itemDeclaration in definition.items:
 
                                     # creating inverter
                                     #sky130_fd_sc_hd__inv_1
+<<<<<<< HEAD
                                     inv_out= vast.PortArg("Y", vast.Identifier("_inv_D"))
                                     invArgs = [ # add counter to the identifier string to identify different clk gate outputs
                                     inv_out,
@@ -101,6 +106,36 @@ for itemDeclaration in definition.items:
                                     tuple(invArgs),
                                     tuple()
                                     )
+=======
+                                    inv_out= vast.PortArg("A", vast.Identifier("_inv_Gclk"))
+                                    invArgs = [ # add counter to the identifier string to identify different clk gate outputs
+                                    inv_out,
+                                    vast.PortArg("Y",A2_input.argname )
+                                    ]
+
+                                    inv_cell = vast.Instance(
+                                    "sky130_fd_sc_hd__inv_1",
+                                    "_inv_Gclk",
+                                    tuple(invArgs),
+                                    tuple()
+                                    )
+                                    
+                                    # inverter needs completion
+
+                                    #dff
+                                    dff= itemDeclaration
+                                    instance_dff = dff.instances[0]
+                                    for port in instance_dff.portlist:
+                                        if port.portname == "CLK": #CLK
+                                            port.argname= GCLK.argname
+                                        if port.portname == "D": #output
+                                            D_input.argname= A2_input.argname
+                                    newrtl.append(dff)
+
+
+
+
+>>>>>>> 75db610358a2134f7dfc134e475ac22dcb2bbe93
                                     
                                     # inverter needs completion
 
