@@ -9,17 +9,11 @@ from pyverilog.ast_code_generator.codegen import ASTCodeGenerator
 
 - support muxes
 
-- support different sizez of muxes and aois         ****done****
-
-- remove unneeded cells    **** done ****
-
 - test cases
 
 - simulate test cases
 
 - readme
-
-- originnal clk    ***done****
 
 """
 
@@ -126,11 +120,11 @@ for itemDeclaration in definition.items:
                                     # add counter to the identifier string to identify different clk gate outputs
                                     inv_cell = vast.Instance(
                                     "sky130_fd_sc_hd__inv_1",
-                                     "_inv_D_"+str(inv_counter),
+                                     "_inv_D_"+str(inv_counter)+"_",
                                     tuple(invArgs),
                                     tuple()
                                     )
-                                    inverterr=vast.InstanceList("sky130_fd_sc_hd__inv", tuple(), tuple([inv_cell]))
+                                    inverterr=vast.InstanceList("sky130_fd_sc_hd__inv_1", tuple(), tuple([inv_cell]))
                                     # inverter needs completion
 
 

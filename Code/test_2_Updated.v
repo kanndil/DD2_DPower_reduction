@@ -182,8 +182,8 @@ module test1
 
   wire _inv_D_0;
 
-  sky130_fd_sc_hd__inv
-  _inv_D_0
+  sky130_fd_sc_hd__inv_1
+  _inv_D_0_
   (
     .Y(_inv_D_0),
     .A(_05_)
@@ -200,8 +200,8 @@ module test1
 
   wire _inv_D_1;
 
-  sky130_fd_sc_hd__inv
-  _inv_D_1
+  sky130_fd_sc_hd__inv_1
+  _inv_D_1_
   (
     .Y(_inv_D_1),
     .A(_09_)
@@ -218,8 +218,8 @@ module test1
 
   wire _inv_D_2;
 
-  sky130_fd_sc_hd__inv
-  _inv_D_2
+  sky130_fd_sc_hd__inv_1
+  _inv_D_2_
   (
     .Y(_inv_D_2),
     .A(_13_)
@@ -236,8 +236,8 @@ module test1
 
   wire _inv_D_3;
 
-  sky130_fd_sc_hd__inv
-  _inv_D_3
+  sky130_fd_sc_hd__inv_1
+  _inv_D_3_
   (
     .Y(_inv_D_3),
     .A(_18_)
