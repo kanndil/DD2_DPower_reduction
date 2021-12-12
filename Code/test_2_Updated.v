@@ -61,16 +61,6 @@ module test1
   );
 
 
-  sky130_fd_sc_hd__a21oi_1
-  _22_
-  (
-    .A1(s),
-    .A2(_05_),
-    .B1(_06_),
-    .Y(_00_)
-  );
-
-
   sky130_fd_sc_hd__nand2_1
   _23_
   (
@@ -104,16 +94,6 @@ module test1
     .A(s),
     .B(r[1]),
     .Y(_10_)
-  );
-
-
-  sky130_fd_sc_hd__a21oi_1
-  _27_
-  (
-    .A1(s),
-    .A2(_09_),
-    .B1(_10_),
-    .Y(_01_)
   );
 
 
@@ -154,16 +134,6 @@ module test1
   );
 
 
-  sky130_fd_sc_hd__a21oi_1
-  _32_
-  (
-    .A1(s),
-    .A2(_13_),
-    .B1(_14_),
-    .Y(_02_)
-  );
-
-
   sky130_fd_sc_hd__nor2_1
   _33_
   (
@@ -200,83 +170,85 @@ module test1
     .Y(_18_)
   );
 
-
-  sky130_fd_sc_hd__a21oi_1
-  _37_
-  (
-    .A1(s),
-    .A2(_18_),
-    .B1(_15_),
-    .Y(_03_)
-  );
-
   wire _clockgate_output_gclk;
 
-  sky130_fd_sc_hd__dlclkp
+  sky130_fd_sc_hd__dlclkp_1
   _clockgate_cell_
   (
     .GCLK(_clockgate_output_gclk),
     .GATE(s),
-    .CLK(CLK)
+    .CLK(clk)
   );
 
-  wire _inv_D;
-  _inv_D
+  wire _inv_D_0;
+
+  sky130_fd_sc_hd__inv
+  _inv_D_0
   (
-    .Y(_inv_D),
+    .Y(_inv_D_0),
     .A(_05_)
-  )
+  );
+
 
   sky130_fd_sc_hd__dfxtp_1
   _38_
   (
     .CLK(_clockgate_output_gclk),
-    .D(_inv_D),
+    .D(_inv_D_0),
     .Q(r[0])
   );
 
-  wire _inv_D;
-  _inv_D
+  wire _inv_D_1;
+
+  sky130_fd_sc_hd__inv
+  _inv_D_1
   (
-    .Y(_inv_D),
+    .Y(_inv_D_1),
     .A(_09_)
-  )
+  );
+
 
   sky130_fd_sc_hd__dfxtp_1
   _39_
   (
     .CLK(_clockgate_output_gclk),
-    .D(_inv_D),
+    .D(_inv_D_1),
     .Q(r[1])
   );
 
-  wire _inv_D;
-  _inv_D
+  wire _inv_D_2;
+
+  sky130_fd_sc_hd__inv
+  _inv_D_2
   (
-    .Y(_inv_D),
+    .Y(_inv_D_2),
     .A(_13_)
-  )
+  );
+
 
   sky130_fd_sc_hd__dfxtp_1
   _40_
   (
     .CLK(_clockgate_output_gclk),
-    .D(_inv_D),
+    .D(_inv_D_2),
     .Q(r[2])
   );
 
-  wire _inv_D;
-  _inv_D
+  wire _inv_D_3;
+
+  sky130_fd_sc_hd__inv
+  _inv_D_3
   (
-    .Y(_inv_D),
+    .Y(_inv_D_3),
     .A(_18_)
-  )
+  );
+
 
   sky130_fd_sc_hd__dfxtp_1
   _41_
   (
     .CLK(_clockgate_output_gclk),
-    .D(_inv_D),
+    .D(_inv_D_3),
     .Q(r[3])
   );
 
