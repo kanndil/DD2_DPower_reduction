@@ -4,6 +4,25 @@ from pyverilog.ast_code_generator.codegen import ASTCodeGenerator
 
 
 
+"""
+- multiple enables
+
+- support muxes
+
+- support different sizez of muxes and aois         ****done****
+
+- remove unneeded cells    **** done ****
+
+- test cases
+
+- simulate test cases
+
+- readme
+
+- originnal clk    ***done****
+
+"""
+
 
 ######################################################
 rtl = "/Users/youssef/Downloads/test1.gl(1).v"
@@ -16,18 +35,20 @@ definition = desc.definitions[0]
 # loop over all items with type InstanceList
 # print the cell ports and their corresponding arguments
 
+newrtl_out= []
 newrtl= []
-
+aoi_out_list=[]
 inserted_before=0
 D_input=None
 clk= None
 GCLK=None
+inv_counter=0
 #definition.show()
 for itemDeclaration in definition.items:
     item_type = type(itemDeclaration).__name__
     if item_type == "InstanceList":
         instance = itemDeclaration.instances[0]
-        if(instance.module == "sky130_fd_sc_hd__dfxtp_1"):
+        if("sky130_fd_sc_hd__dfxtp" in instance.module):
             for hook in instance.portlist:
                 if hook.portname == "CLK": #CLK
                     clk= hook
@@ -38,7 +59,11 @@ for itemDeclaration in definition.items:
                 item_type_two = type(itemDeclaration_two).__name__
                 if item_type_two == "InstanceList":
                     instance_two = itemDeclaration_two.instances[0]
-                    if(instance_two.module == "sky130_fd_sc_hd__a21oi_1"):
+                    if( "sky130_fd_sc_hd__a21oi" in instance_two.module ):
+                        aoi_name= instance_two.module
+                        aoi_name_arr=aoi_name.split('-')
+                        aoi_size= aoi_name[-1]
+                        print(aoi_size)
                         #print("in sky130_fd_sc_hd__a21oi_1  ifstatement ")
                         A1_input=None
                         A2_input=None
@@ -47,9 +72,10 @@ for itemDeclaration in definition.items:
                                 A1_input=hook
                             if hook.portname == "A2":
                                 A2_input=hook                        
-                            if hook.portname == "Y": #CLK
+                            if hook.portname == "Y": 
                                 #print("in portname = Y ifstatement ")
                                 if hook.argname==D_input.argname :
+                                    aoi_out_list.append(hook)
                                     print("in hook d_input ifstatement ")
                                     # do connect inputs of this aoi to ICG  and append the ICG 
                                     if inserted_before==0:
@@ -60,7 +86,7 @@ for itemDeclaration in definition.items:
                                         clkgateArgs = [ # add counter to the identifier string to identify different clk gate outputs
                                         GCLK,
                                         vast.PortArg("GATE",A1_input.argname ),
-                                        vast.PortArg("CLK", vast.Identifier("CLK")) # match names later##########
+                                        vast.PortArg("CLK", clk.argname) # match names later##########
                                         ]
 
                                         clkgate_cell = vast.Instance(
@@ -72,7 +98,7 @@ for itemDeclaration in definition.items:
                                         #do not forget wire
                                         clockgate_output_gclk = vast.Wire('_clockgate_output_gclk') # match names\
                                         newrtl.append(clockgate_output_gclk)
-                                        ICG=vast.InstanceList("sky130_fd_sc_hd__dlclkp", tuple(), tuple([clkgate_cell]))
+                                        ICG=vast.InstanceList("sky130_fd_sc_hd__dlclkp_"+str(aoi_size), tuple(), tuple([clkgate_cell]))
                                         newrtl.append(ICG)
                                         #ICG created
 
@@ -83,7 +109,7 @@ for itemDeclaration in definition.items:
 
                                     # creating inverter
                                     #sky130_fd_sc_hd__inv_1
-                                    inv_out= vast.PortArg("Y", vast.Identifier("_inv_D"))
+                                    inv_out= vast.PortArg("Y", vast.Identifier("_inv_D_"+str(inv_counter)))
                                     invArgs = [ # add counter to the identifier string to identify different clk gate outputs
                                     inv_out,
                                     vast.PortArg("A",A2_input.argname )
@@ -91,25 +117,26 @@ for itemDeclaration in definition.items:
 
 
 
-                                    inv_output_gclk = vast.Wire('_inv_D') # match names\
+                                    inv_output_gclk = vast.Wire("_inv_D_"+str(inv_counter)) # match names\
 
 
                                     newrtl.append(inv_output_gclk)
 
 
-
+                                    # add counter to the identifier string to identify different clk gate outputs
                                     inv_cell = vast.Instance(
-                                    "sky130_fd_sc_hd__inv_1",# add counter to the identifier string to identify different clk gate outputs
-                                    "_inv_D",
+                                    "sky130_fd_sc_hd__inv_1",
+                                     "_inv_D_"+str(inv_counter),
                                     tuple(invArgs),
                                     tuple()
                                     )
-                                    
+                                    inverterr=vast.InstanceList("sky130_fd_sc_hd__inv", tuple(), tuple([inv_cell]))
                                     # inverter needs completion
 
 
 
-                                    newrtl.append(inv_cell)
+                                    newrtl.append(inverterr)
+                                    inv_counter+=1
 
 
 
@@ -127,18 +154,44 @@ for itemDeclaration in definition.items:
 
          
          
-         
+
+for itemDeclaration in definition.items:
+    item_type = type(itemDeclaration).__name__
+    if item_type == "InstanceList": 
+        instance = itemDeclaration.instances[0]
+        if("sky130_fd_sc_hd__dfxtp" in instance.module):
+            print("disregard dff")
+        elif("sky130_fd_sc_hd__a21oi" in instance.module):
+            temp= itemDeclaration
+            instance_temp = temp.instances[0]
+            for port in instance_temp.portlist:
+                if port.portname == "Y":
+                    flag=False
+                    for output in aoi_out_list:
+                        if (output.argname == port.argname):
+                            flag=True
+
+            if flag == False:
+                newrtl_out.append(itemDeclaration)
+                            
+
+                
         else:
-            newrtl.append(itemDeclaration)                                 
+            newrtl_out.append(itemDeclaration)                                 
 
 
 
     else:
 
-        newrtl.append(itemDeclaration)
+        newrtl_out.append(itemDeclaration)
 
 
-definition.items = tuple(newrtl)
+
+newrtl_out+= newrtl
+
+
+
+definition.items = tuple(newrtl_out)
 codegen = ASTCodeGenerator()
 rslt = codegen.visit(ast)
 f = open("test_2_Updated.v", "w+")
