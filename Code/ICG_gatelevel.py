@@ -188,57 +188,21 @@ for itemDeclaration in definition.items:
                                         #ICG created
 
 
-                                        #create the connection between iCG and dff and append dff
-                                        # _clockgate_output_gclk-- >> clk dff
-                                        #  (~S) inversion of sum --> d dff
 
-                                        # creating inverter
-                                        #sky130_fd_sc_hd__inv_1
-                                        inv_out = vast.PortArg("X", vast.Identifier("_inv_D_" + str(inv_counter)))
-                                        invArgs = [# add counter to the identifier string to identify different clk gate outputs
-                                        inv_out,
-                                        vast.PortArg("A", A1_input.argname)
-                                        ]
-
-
-
-                                        inv_output_gclk = vast.Wire("_inv_D_" + str(inv_counter)) # match names\
-
-
-                                        newrtl.append(inv_output_gclk)
-
-
-                                        # add counter to the identifier string to identify different clk gate outputs
-                                        inv_cell = vast.Instance(
-                                            "sky130_fd_sc_hd__inv_1",
-                                            "_inv_D_" + str(inv_counter) + "_",
-                                            tuple(invArgs),
-                                            tuple()
-                                        )
-                                        inverterr = vast.InstanceList("sky130_fd_sc_hd__inv_1", tuple(), tuple([inv_cell]))
-                                        # inverter needs completion
-
-
-
-                                        newrtl.append(inverterr)
-                                        inv_counter += 1
-
-
-
-                                        #dff
-                                        dff = itemDeclaration
-                                        instance_dff = dff.instances[0]
-                                        for port in instance_dff.portlist:
-                                            if port.portname == "CLK" : #CLK
-                                                port.argname = GCLK.argname
-                                            if port.portname == "D": #output
-                                                D_input.argname = inv_out.argname
-
-                                        newrtl.append(dff)
+                                    #dff
+                                    dff = itemDeclaration
+                                    instance_dff = dff.instances[0]
+                                    for port in instance_dff.portlist:
+                                        if port.portname == "CLK" : #CLK
+                                            port.argname = GCLK.argname
+                                        if port.portname == "D": #output
+                                            D_input.argname = A1_input.argname
+                                    newrtl.append(dff)
    
 
 
          
+    
          
 
 for itemDeclaration in definition.items:
@@ -259,7 +223,20 @@ for itemDeclaration in definition.items:
 
             if flag == False:
                 newrtl_out.append(itemDeclaration)
-                            
+
+        elif("sky130_fd_sc_hd__mux" in instance.module):
+            temp= itemDeclaration
+            instance_temp = temp.instances[0]
+            for port in instance_temp.portlist:
+                if port.portname == "X":
+                    flag=False
+                    for output in aoi_out_list:
+                        if (output.argname == port.argname):
+                            flag=True
+
+            if flag == False:
+                newrtl_out.append(itemDeclaration)          
+
 
                 
         else:
