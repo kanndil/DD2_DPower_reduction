@@ -1,4 +1,9 @@
 
+![the_american_university_in_cairo_0](https://user-images.githubusercontent.com/63082375/145811756-2f79725d-d6b6-497c-b655-98809e2c2eda.jpg)
+
+
+
+
 # DD2_DPower_reduction
 A utility to reduce the dynamic power consumption by performing automatic clock gating for registers.
 
@@ -36,6 +41,10 @@ and the code should run.
 
 # how the code works 
 - first approach 
+
+![new_system_without_mux](https://user-images.githubusercontent.com/63082375/145812282-56d5ec1a-b665-4e85-9c8b-435088a78689.png)
+
+
     + this utility takes a gate-level netlist that is produced from a synthesizer like yosys
     + it searches for flipflop modules in the netlist 
     + then from their inputs it detects the preceding cell
@@ -51,6 +60,10 @@ and the code should run.
     + a better Idea would be inserting the ICG cells within the intermediate language produced by yosys
 
 - second approach 
+
+<img width="462" alt="refenced_image" src="https://user-images.githubusercontent.com/63082375/145812148-8c9b64ed-bbdb-44ca-a263-b8632cf30081.png">
+
+
     + this utility takes a RTL verilog code
     + it detects an always statement
     + checks if it has an if condition that checks the module's enable
@@ -66,7 +79,7 @@ and the code should run.
                  end
             always @(posedge new_clk) r <= x;-->
 
-        + a better Idea would be inserting an ICG cell corresponding to the mapping technology
+     + a better Idea would be inserting an ICG cell corresponding to the mapping technology
 
 
 
