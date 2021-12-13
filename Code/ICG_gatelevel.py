@@ -16,7 +16,7 @@ from pyverilog.ast_code_generator.codegen import ASTCodeGenerator
 
 
 ######################################################
-rtl = "/Users/youssef/Documents/Academics/semester_vi/DD2/DD2_DPower_reduction/Testing/approach_one/test_two/test2.gl.v"
+rtl = "/Users/youssef/Documents/Academics/semester_vi/DD2/DD2_DPower_reduction/Testing/approach_one/test_four/test4.gl.v"
 ast,_ = parse([rtl])
 # get the root node of the tree (Description)
 desc = ast.description
@@ -271,6 +271,6 @@ newrtl_out+= newrtl
 definition.items = tuple(newrtl_out)
 codegen = ASTCodeGenerator()
 rslt = codegen.visit(ast)
-f = open("/Users/youssef/Documents/Academics/semester_vi/DD2/DD2_DPower_reduction/Testing/approach_one/test_two/test2.gl.updated.v", "w+")
+f = open("/Users/youssef/Documents/Academics/semester_vi/DD2/DD2_DPower_reduction/Testing/approach_one/test_four/test4.gl.updated.v", "w+")
 f.write(rslt)
 f.close()

@@ -1,7 +1,8 @@
 
-`include "primitives.v"
-`include "sky130_fd_sc_hd.v"
-
+`define FUNCTIONAL
+`define UNIT_DELAY #1
+`include "src/primitives.v"
+`include "src/sky130_fd_sc_hd.v"
 `timescale 1ns/1ns
 
 module test_tb;
