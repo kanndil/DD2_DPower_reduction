@@ -5,9 +5,6 @@ from pyverilog.ast_code_generator.codegen import ASTCodeGenerator
 
 
 """
-- multiple enables
-
-- support muxes
 
 - test cases
 
@@ -19,7 +16,7 @@ from pyverilog.ast_code_generator.codegen import ASTCodeGenerator
 
 
 ######################################################
-rtl = "/Users/youssef/Downloads/test1.gl(1).v"
+rtl = "/Users/youssef/Documents/Academics/semester_vi/DD2/DD2_DPower_reduction/Testing/approach_one/test_two/test2.gl.v"
 ast,_ = parse([rtl])
 # get the root node of the tree (Description)
 desc = ast.description
@@ -33,10 +30,11 @@ newrtl_out= []
 newrtl= []
 aoi_out_list=[]
 mux_out_list=[]
+enable_list=[["",""]]
 inserted_before=0
 D_input=None
 clk= None
-GCLK=None
+Gclk_counter=0
 inv_counter=0
 #definition.show()
 for itemDeclaration in definition.items:
@@ -59,7 +57,6 @@ for itemDeclaration in definition.items:
                         aoi_name_arr=aoi_name.split('-')
                         aoi_size= aoi_name[-1]
                         print(aoi_size)
-                        #print("in sky130_fd_sc_hd__a21oi_1  ifstatement ")
                         A1_input=None
                         A2_input=None
                         for hook in instance_two.portlist:
@@ -68,15 +65,23 @@ for itemDeclaration in definition.items:
                             if hook.portname == "A2":
                                 A2_input=hook                        
                             if hook.portname == "Y": 
-                                #print("in portname = Y ifstatement ")
                                 if hook.argname==D_input.argname :
                                     aoi_out_list.append(hook)
                                     print("in hook d_input ifstatement ")
                                     # do connect inputs of this aoi to ICG  and append the ICG 
-                                    if inserted_before==0:
-                                        inserted_before=1
+                                    GCLK=None
+                                    for enable in enable_list:
+                                        if (enable[0] == A1_input.argname):
+                                            GCLK=enable[1]
+                                            
+                                    if (GCLK==None):
+
+                                        
                                         # because thois is the matching hook
-                                        GCLK=vast.PortArg("GCLK", vast.Identifier("_clockgate_output_gclk"))
+                                        GCLK=vast.PortArg("GCLK", vast.Identifier("_clockgate_output_gclk_"+str(Gclk_counter)))
+
+                                        enable_list.append([A1_input.argname,GCLK])
+                                        
 
                                         clkgateArgs = [ # add counter to the identifier string to identify different clk gate outputs
                                         GCLK,
@@ -86,15 +91,16 @@ for itemDeclaration in definition.items:
 
                                         clkgate_cell = vast.Instance(
                                         "sky130_fd_sc_hd__dlclkp",
-                                        "_clockgate_cell_",
+                                        "_clockgate_cell_"+str(Gclk_counter)+"_",
                                         tuple(clkgateArgs),
                                         tuple()
                                         )
                                         #do not forget wire
-                                        clockgate_output_gclk = vast.Wire('_clockgate_output_gclk') # match names\
+                                        clockgate_output_gclk = vast.Wire('_clockgate_output_gclk_'+str(Gclk_counter)) # match names\
                                         newrtl.append(clockgate_output_gclk)
                                         ICG=vast.InstanceList("sky130_fd_sc_hd__dlclkp_"+str(aoi_size), tuple(), tuple([clkgate_cell]))
                                         newrtl.append(ICG)
+                                        Gclk_counter+=1
                                         #ICG created
 
 
@@ -109,8 +115,6 @@ for itemDeclaration in definition.items:
                                     inv_out,
                                     vast.PortArg("A",A2_input.argname )
                                     ]
-
-
 
                                     inv_output_gclk = vast.Wire("_inv_D_"+str(inv_counter)) # match names\
 
@@ -163,10 +167,19 @@ for itemDeclaration in definition.items:
                                     mux_out_list.append(hook)
                                     print("in hook d_input ifstatement ")
 
-                                    if inserted_before == 0:
-                                        inserted_before = 1
+                                    GCLK=None
+                                    for enable in enable_list:
+                                        if (enable[0] == S_input.argname):
+                                            GCLK=enable[1]
+                                            
+                                    if (GCLK==None):
 
-                                        GCLK = vast.PortArg("GCLK", vast.Identifier("_clockgate_output_gclk"))
+                                        
+                                        # because thois is the matching hook
+                                        GCLK=vast.PortArg("GCLK", vast.Identifier("_clockgate_output_gclk_"+str(Gclk_counter)))
+
+                                        enable_list.append([S_input.argname,GCLK])
+
 
                                         clkgateArgs = [# add counter to the identifier string to identify different clk gate outputs
                                         GCLK,
@@ -176,15 +189,16 @@ for itemDeclaration in definition.items:
 
                                         clkgate_cell = vast.Instance(
                                             "sky130_fd_sc_hd__dlclkp",
-                                            "_clockgate_cell_",
+                                            "_clockgate_cell_"+str(Gclk_counter)+"_",
                                             tuple(clkgateArgs),
                                             tuple()
                                         )
                                         #do not forget wire
-                                        clockgate_output_gclk = vast.Wire('_clockgate_output_gclk') # match names\
+                                        clockgate_output_gclk = vast.Wire('_clockgate_output_gclk_'+str(Gclk_counter)) # match names\
                                         newrtl.append(clockgate_output_gclk)
                                         ICG = vast.InstanceList("sky130_fd_sc_hd__dlclkp_" + str(mux_size), tuple(), tuple([clkgate_cell]))
                                         newrtl.append(ICG)
+                                        Gclk_counter+=1
                                         #ICG created
 
 
@@ -230,7 +244,7 @@ for itemDeclaration in definition.items:
             for port in instance_temp.portlist:
                 if port.portname == "X":
                     flag=False
-                    for output in aoi_out_list:
+                    for output in mux_out_list:
                         if (output.argname == port.argname):
                             flag=True
 
@@ -257,6 +271,6 @@ newrtl_out+= newrtl
 definition.items = tuple(newrtl_out)
 codegen = ASTCodeGenerator()
 rslt = codegen.visit(ast)
-f = open("test_2_Updated.v", "w+")
+f = open("/Users/youssef/Documents/Academics/semester_vi/DD2/DD2_DPower_reduction/Testing/approach_one/test_two/test2.gl.updated.v", "w+")
 f.write(rslt)
 f.close()

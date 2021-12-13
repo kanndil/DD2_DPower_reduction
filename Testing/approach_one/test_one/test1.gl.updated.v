@@ -170,12 +170,12 @@ module test1
     .Y(_18_)
   );
 
-  wire _clockgate_output_gclk;
+  wire _clockgate_output_gclk_0;
 
   sky130_fd_sc_hd__dlclkp_1
-  _clockgate_cell_
+  _clockgate_cell_0_
   (
-    .GCLK(_clockgate_output_gclk),
+    .GCLK(_clockgate_output_gclk_0),
     .GATE(s),
     .CLK(clk)
   );
@@ -193,7 +193,7 @@ module test1
   sky130_fd_sc_hd__dfxtp_1
   _38_
   (
-    .CLK(_clockgate_output_gclk),
+    .CLK(_clockgate_output_gclk_0),
     .D(_inv_D_0),
     .Q(r[0])
   );
@@ -211,7 +211,7 @@ module test1
   sky130_fd_sc_hd__dfxtp_1
   _39_
   (
-    .CLK(_clockgate_output_gclk),
+    .CLK(_clockgate_output_gclk_0),
     .D(_inv_D_1),
     .Q(r[1])
   );
@@ -229,7 +229,7 @@ module test1
   sky130_fd_sc_hd__dfxtp_1
   _40_
   (
-    .CLK(_clockgate_output_gclk),
+    .CLK(_clockgate_output_gclk_0),
     .D(_inv_D_2),
     .Q(r[2])
   );
@@ -247,7 +247,7 @@ module test1
   sky130_fd_sc_hd__dfxtp_1
   _41_
   (
-    .CLK(_clockgate_output_gclk),
+    .CLK(_clockgate_output_gclk_0),
     .D(_inv_D_3),
     .Q(r[3])
   );
