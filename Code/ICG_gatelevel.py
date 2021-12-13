@@ -32,6 +32,7 @@ definition = desc.definitions[0]
 newrtl_out= []
 newrtl= []
 aoi_out_list=[]
+mux_out_list=[]
 inserted_before=0
 D_input=None
 clk= None
@@ -53,7 +54,7 @@ for itemDeclaration in definition.items:
                 item_type_two = type(itemDeclaration_two).__name__
                 if item_type_two == "InstanceList":
                     instance_two = itemDeclaration_two.instances[0]
-                    if( "sky130_fd_sc_hd__a21oi" in instance_two.module ):
+                    if( "sky130_fd_sc_hd__a21oi" in instance_two.module):
                         aoi_name= instance_two.module
                         aoi_name_arr=aoi_name.split('-')
                         aoi_size= aoi_name[-1]
@@ -143,7 +144,98 @@ for itemDeclaration in definition.items:
                                         if port.portname == "D": #output
                                             D_input.argname= inv_out.argname
 
-                                    newrtl.append(dff)   
+                                    newrtl.append(dff)
+                    elif ("sky130_fd_sc_hd__mux" in instance_two.module) :
+                        mux_name = instance_two.module
+                        mux_name_arr = mux_name.split('-')
+                        mux_size = mux_name[-1]
+                        print(mux_size)
+
+                        S_input = None
+                        A1_input = None
+                        for hook in instance_two.portlist:
+                            if hook.portname == "S" :
+                                S_input = hook
+                            if hook.portname == "A1" :
+                                A1_input = hook
+                            if hook.portname == "X" :
+                                if hook.argname == D_input.argname :
+                                    mux_out_list.append(hook)
+                                    print("in hook d_input ifstatement ")
+
+                                    if inserted_before == 0:
+                                        inserted_before = 1
+
+                                        GCLK = vast.PortArg("GCLK", vast.Identifier("_clockgate_output_gclk"))
+
+                                        clkgateArgs = [# add counter to the identifier string to identify different clk gate outputs
+                                        GCLK,
+                                        vast.PortArg("GATE", S_input.argname),
+                                        vast.PortArg("CLK", clk.argname) # match names later##########
+                                        ]
+
+                                        clkgate_cell = vast.Instance(
+                                            "sky130_fd_sc_hd__dlclkp",
+                                            "_clockgate_cell_",
+                                            tuple(clkgateArgs),
+                                            tuple()
+                                        )
+                                        #do not forget wire
+                                        clockgate_output_gclk = vast.Wire('_clockgate_output_gclk') # match names\
+                                        newrtl.append(clockgate_output_gclk)
+                                        ICG = vast.InstanceList("sky130_fd_sc_hd__dlclkp_" + str(mux_size), tuple(), tuple([clkgate_cell]))
+                                        newrtl.append(ICG)
+                                        #ICG created
+
+
+                                        #create the connection between iCG and dff and append dff
+                                        # _clockgate_output_gclk-- >> clk dff
+                                        #  (~S) inversion of sum --> d dff
+
+                                        # creating inverter
+                                        #sky130_fd_sc_hd__inv_1
+                                        inv_out = vast.PortArg("X", vast.Identifier("_inv_D_" + str(inv_counter)))
+                                        invArgs = [# add counter to the identifier string to identify different clk gate outputs
+                                        inv_out,
+                                        vast.PortArg("A", A1_input.argname)
+                                        ]
+
+
+
+                                        inv_output_gclk = vast.Wire("_inv_D_" + str(inv_counter)) # match names\
+
+
+                                        newrtl.append(inv_output_gclk)
+
+
+                                        # add counter to the identifier string to identify different clk gate outputs
+                                        inv_cell = vast.Instance(
+                                            "sky130_fd_sc_hd__inv_1",
+                                            "_inv_D_" + str(inv_counter) + "_",
+                                            tuple(invArgs),
+                                            tuple()
+                                        )
+                                        inverterr = vast.InstanceList("sky130_fd_sc_hd__inv_1", tuple(), tuple([inv_cell]))
+                                        # inverter needs completion
+
+
+
+                                        newrtl.append(inverterr)
+                                        inv_counter += 1
+
+
+
+                                        #dff
+                                        dff = itemDeclaration
+                                        instance_dff = dff.instances[0]
+                                        for port in instance_dff.portlist:
+                                            if port.portname == "CLK" : #CLK
+                                                port.argname = GCLK.argname
+                                            if port.portname == "D": #output
+                                                D_input.argname = inv_out.argname
+
+                                        newrtl.append(dff)
+   
 
 
          
