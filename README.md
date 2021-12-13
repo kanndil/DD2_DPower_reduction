@@ -1,3 +1,4 @@
+
 # DD2_DPower_reduction
 A utility to reduce the dynamic power consumption by performing automatic clock gating for registers.
 
@@ -29,4 +30,60 @@ to run the tool you must first download the source code called ICG_gatelevel.py 
 
 
 # how to complie the code 
-Open the terminal from within the file that has both the code and the test case and write python ICG_gatelevel.py and the code should run.
+Open the terminal from within the file that has both the code and the test case and write 
+- python3 ICG_gatelevel.py 
+and the code should run.
+
+# how the code works 
+- first approach 
+    + this utility takes a gate-level netlist that is produced from a synthesizer like yosys
+    + it searches for flipflop modules in the netlist 
+    + then from their inputs it detects the preceding cell
+    + if the preceding cell is a mux 
+        - replace it with an ICG cell that correspondes to the size of the mux
+    + else if the preceding cell is an AOI 
+        - check if one of the cell's inputs is connected to an enable 
+        - remove the AOI mux
+        - take the other input of the AOI, invert it and connect it to the flipflop refer to the diagrams in the diagrams folder)
+        - insert the ICG cell
+    + write the cells into a new file
+
+    + a better Idea would be inserting the ICG cells within the intermediate language produced by yosys
+
+- second approach 
+    + this utility takes a RTL verilog code
+    + it detects an always statement
+    + checks if it has an if condition that checks the module's enable
+        - removes the if statement
+        - inserts a latch and an and gate 
+        - creating an ICG logic  (refer to the diagrams in the diagrams folder)
+        - for example:
+    
+        <!--assign new_clk = (new_enable & clk);
+                always @(clk or s) begin
+                    if(~clk) new_enable <= s; 
+                    else new_enable <= new_enable;
+                 end
+            always @(posedge new_clk) r <= x;-->
+
+        + a better Idea would be inserting an ICG cell corresponding to the mapping technology
+
+
+
+# what works?
+    - test case (1-2-3)
+    - normal 2x1 muxes of any size
+    - a21oi mux circuits of any size
+    - modules of combinational logic within sequential logic
+    - multiple enables modules
+    - single enable modules with multiple flipflops (creates only one ICG unit)--> fanout is not considered (requires modification for real use)
+
+# what does not work?
+    - test case (4)
+    - other form of muxes than the specified above
+    - more than two input muxes
+    - the utility does not show any messages if it does not work correctly
+    - needs verification before use 
+
+
+

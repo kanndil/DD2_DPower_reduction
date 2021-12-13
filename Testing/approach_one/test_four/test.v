@@ -13,8 +13,5 @@ module test4(input [7:0] x, y, input clk, s1,  output reg [7:0] r);
 
 
     end
-
-
-  
             
 endmodule
