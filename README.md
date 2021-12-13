@@ -25,7 +25,7 @@ A utility to reduce the dynamic power consumption by performing automatic clock 
 
 
 # how to use the tool
-to run the tool you must first download the source code called ICG_gatelevel.py and give it the test case verilog code that you want to generate its netlist from within the code itself. 
+to run the tool you must first download the source code called ICG_gatelevel.py and give it a gate level netlist that you want to generate its modified version from within the code itself. 
 
 
 # how to complie the code 
