@@ -1,4 +1,4 @@
-module test1
+module test
 (
   input x,
   input s,
